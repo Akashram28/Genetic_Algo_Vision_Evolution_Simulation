@@ -1,8 +1,9 @@
 class Individual:
-    def __init__(self,vision):
+    def __init__(self,hp,vision,speed,mateSelectionProb):
+        self.hp = hp
         self.vision = vision
-        self.hp = 50
-        self.speed = 80
+        self.speed = speed
+        self.mateSelectionProb = mateSelectionProb # Prob of using biased random instead of tournament
         self.maxVision = 180
     
     def eat(self,food):
