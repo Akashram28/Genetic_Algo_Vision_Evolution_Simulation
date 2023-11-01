@@ -8,6 +8,7 @@ class World:
         self.indiPop = 10
         self.predPop = 3
         self.foodCount = 20
+        self.mutationChance = 0.1
     
     def spawn(self):
         indis = [Individual(50,random.randint(0,20),80,0.5) for i in range(self.indiPop)]
@@ -46,7 +47,7 @@ class World:
             indi2 = self.tournamentSelection(indi1)
         else:
             indi2 = self.biasedRandomSelection(indi1)
-        return (indi1,indi2)
+        return indi1,indi2
     
     def tournamentSelection(self,indi1):
         indi2 = self.indis[random.randint(0,self.indiPop-1)]
@@ -82,13 +83,46 @@ class World:
         mateSelectionProb2 = parents[0 if mateSelectionProb1==1 else 1].mateSelectionProb
 
         child1 = Individual(hp1,vision1,speed1,mateSelectionProb1)
+        child1 = self.mutate(child1)
         child2 = Individual(hp2,vision2,speed2,mateSelectionProb2)
+        child2 = self.mutate(child2)
+
+        return child1,child2
 
     def mutate(self,indi):
-        pass
+        if random.random() < self.mutationChance:
+            newVision = min(indi.vision + random.randint(-10,10),indi.maxVision)
+            newSpeed = indi.speed + random.randint(-5,5)
+            newHp = indi.hp + random.randint(-10,10)
+            newMateSelectionProb = indi.mateSelectionProb + random.randint(-10,10)/100
+
+            indi.vision = newVision
+            indi.speed = newSpeed
+            indi.hp = newHp
+            indi.mateSelectionProb = newMateSelectionProb
+            return indi
+        return indi
 
     def newGeneration(self):
-        pass
+        self.endGeneration()
+        indis = []
+        for i in range(self.indiPop//2):
+            parent1 , parent2 = self.selectParents()
+            child1 , child2 = self.crossover(parent1,parent2)
+            indis.append(child1)
+            indis.append(child2)
+        self.indis = indis
+        self.indiPop = len(indis)
+    
+    def getBestIndi(self):
+        bestFitness = -float('inf')
+        bestIndi = None
+        for i in self.indis:
+            fitness = i.getFitness()
+            if fitness > bestFitness:
+                bestFitness = fitness
+                bestIndi = i
+        return bestIndi
 
 
     
