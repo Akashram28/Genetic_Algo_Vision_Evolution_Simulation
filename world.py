@@ -3,17 +3,31 @@ from individual import Individual
 from predator import Predator
 from food import Food
 
+
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
 class World:
-    def __init__(self):
-        self.indiPop = 10
-        self.predPop = 3
-        self.foodCount = 20
-        self.mutationChance = 0.1
+    def __init__(self,indiPop,predPop,foodCount,mutationChance,visionRadius,width,height,predSpeed,indiSpeed,foodSize,predSize,indiSize):
+        self.indiPop = indiPop
+        self.predPop = predPop
+        self.foodCount = foodCount
+        self.mutationChance = mutationChance
+        self.visionRadius = visionRadius
+        self.width = width
+        self.height = height
+        self.predSpeed = predSpeed
+        self.indiSpeed = indiSpeed
+        self.foodSize = foodSize
+        self.predSize = predSize
+        self.indiSize = indiSize
     
-    def spawn(self):
-        indis = [Individual(50,random.randint(0,20),80,0.5) for i in range(self.indiPop)]
-        preds = [Predator(random.randint(0,20)) for i in range(self.predPop)]
-        food = [Food(random.randint(0,500),random.randint(0,500),10)]
+    def spawn(self,indiVisionRange,predVisionRange,width,height):
+        # self,hp,vision,speed,mateSelectionProb,color,visionRadius,width,height,size
+        indis = [Individual(50,random.randint(50,indiVisionRange),self.indiSpeed,0.5,GREEN,self.visionRadius,self.width,self.height,self.indiSize) for i in range(self.indiPop)]
+        preds = [Predator(100,random.randint(50,predVisionRange),self.predSpeed,0.5,RED,self.visionRadius,self.width,self.height,self.predSize) for i in range(self.predPop)]
+        food = [Food(10,random.randint(0,width),random.randint(0,height),self.foodSize) for i in range(self.foodCount)]
         self.indis = indis
         self.preds = preds
         self.food = food
@@ -44,12 +58,12 @@ class World:
     def selectParents(self):
         indi1 = self.indis[random.randint(0,self.indiPop-1)]
         if random.random() < indi1.mateSelectionProb:
-            indi2 = self.tournamentSelection(indi1)
+            indi2 = self.tournamentSelection()
         else:
             indi2 = self.biasedRandomSelection(indi1)
         return indi1,indi2
     
-    def tournamentSelection(self,indi1):
+    def tournamentSelection(self):
         indi2 = self.indis[random.randint(0,self.indiPop-1)]
         indi3 = self.indis[random.randint(0,self.indiPop-1)]
         while indi2 == indi3:
