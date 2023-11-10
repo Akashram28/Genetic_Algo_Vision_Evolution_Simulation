@@ -23,7 +23,7 @@ class World:
 
         indis = []
         for i in self.indis:
-            if random.randint(0,180) < i.vision:
+            if i.hp > 0:
                 indis.append(i)
         self.indis = indis
         self.indiPop = len(indis)
