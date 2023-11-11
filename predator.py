@@ -13,14 +13,13 @@ class Predator:
     #     self.speed = 3
     #     self.maxVision = math.radians(150)
     
-    def __init__(self,hp,vision,speed,mateSelectionProb,color,visionRadius,width,height,predSize):
+    def __init__(self,hp,vision,speed,mateSelectionProb,color,width,height,predSize,maxVision):
         self.color = color
         self.hp = hp
-        self.vision = math.radians(vision)
+        self.vision = vision
         self.speed = speed
-        self.visionRadius = visionRadius
         self.mateSelectionProb = mateSelectionProb # Prob of using biased random instead of tournament
-        self.maxVision = math.radians(150)
+        self.maxVision = maxVision
         self.angle = random.uniform(0, 2*math.pi)  # Initial random angle
         self.x = random.randint(0, width)
         self.y = random.randint(0, height)
@@ -50,7 +49,7 @@ class Predator:
         self.check_boundaries()
 
     def random_movement(self):
-        self.angle += random.uniform(0, 0.05)  # Add a small random angle change
+        self.angle += random.uniform(-1, 1)  # Add a small random angle change
         self.x += self.speed * math.cos(self.angle)
         self.y += self.speed * math.sin(self.angle)
         self.check_boundaries()
@@ -62,5 +61,6 @@ class Predator:
 
     def draw(self, screen):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.predSize)
-        pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle), self.y + self.visionRadius*math.cos(self.angle)))
-        pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle + self.vision), self.y + self.visionRadius*math.cos(self.angle + self.vision)))
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.vision, width=1)
+        # pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle ), self.y + self.visionRadius*math.cos(self.angle)))
+        # pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle + self.vision), self.y + self.visionRadius*math.cos(self.angle + self.vision)))

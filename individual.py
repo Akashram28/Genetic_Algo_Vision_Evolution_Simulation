@@ -7,14 +7,13 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 class Individual:
-    def __init__(self,hp,vision,speed,mateSelectionProb,color,visionRadius,width,height,indiSize):
+    def __init__(self,hp,vision,speed,mateSelectionProb,color,width,height,indiSize,maxVision):
         self.color = color
         self.hp = hp
-        self.vision = math.radians(vision)
+        self.vision = vision
         self.speed = speed
-        self.visionRadius = visionRadius
         self.mateSelectionProb = mateSelectionProb # Prob of using biased random instead of tournament
-        self.maxVision = math.radians(180)
+        self.maxVision = maxVision
         self.angle = random.uniform(0, 2*math.pi)  # Initial random angle
         self.x = random.randint(0, width)
         self.y = random.randint(0, height)
@@ -39,12 +38,12 @@ class Individual:
 
     def move_away(self, target_x, target_y):
         angle_away = math.atan2(target_y - self.y, target_x - self.x) + math.pi
-        self.x += self.speed * math.cos(angle_away)
-        self.y += self.speed * math.sin(angle_away)
+        self.x += self.speed * math.cos(angle_away) + random.randint(0,15)
+        self.y += self.speed * math.sin(angle_away) + random.randint(0,15)
         self.check_boundaries()
 
     def random_movement(self):
-        self.angle += random.uniform(0, 0.05)  # Add a small random angle change
+        self.angle += random.uniform(-1, 1)  # Add a small random angle change
         self.x += self.speed * math.cos(self.angle)
         self.y += self.speed * math.sin(self.angle)
         self.check_boundaries()
@@ -56,6 +55,9 @@ class Individual:
 
     def draw(self, screen):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.indiSize)
-        pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle), self.y + self.visionRadius*math.cos(self.angle)))
-        pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle + self.vision), self.y + self.visionRadius*math.cos(self.angle + self.vision)))
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.vision, width=1)
+        # pygame.draw.line(screen,RED, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle), self.y + self.visionRadius*math.cos(self.angle)))
+        # pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle + self.vision), self.y + self.visionRadius*math.cos(self.angle + self.vision)))
+        # pygame.draw.line(screen,BLUE, (self.x, self.y), (self.x + self.visionRadius*math.sin(self.angle), self.y + self.visionRadius*math.cos(self.angle)))
+
 
