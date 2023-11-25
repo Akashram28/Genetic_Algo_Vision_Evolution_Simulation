@@ -13,29 +13,28 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 # Define simulation parameters
-width, height = 800, 600
-fps = 500
+width, height = 1500, 750
 
 # Define agent parameters
-num_preds = 100
-num_indis = 200
-num_food = 600
+num_preds = 200
+num_indis = 400
+num_food = 1500
 mutationChance = 0.1
 
-pred_speed = 10
-indi_speed = 15
+fps = 500
 
-food_size = 2
-pred_size = 3
-indi_size = 3
+pred_speed = 5
+indi_speed = 5
+
+food_size = 0.5
+pred_size = 1
+indi_size = 1
 
 vision = math.radians(90)  # Field of vision angle for both pred and indi
 vision = 10  # Field of vision radius for both pred and indi
 
 indiVisionRange = 20
 predVisionRange = 20
-
-
 
 def saveStats(stats):
     df = pd.DataFrame(stats)
@@ -59,7 +58,7 @@ def main():
               width=width,
               height=height,
               predSpeed = 2,
-              indiSpeed = 3,
+              indiSpeed = 2,
               foodSize = 3,
               predSize = 4,
               indiSize = 4,
@@ -84,46 +83,52 @@ def main():
                     sys.exit()
 
             # pred behavior
-            for pred in preds:
-                if pred.hp <=0:
+            for pred in preds.copy():
+                if pred.hp <= 0:
                     preds.remove(pred)
                     continue
+
                 found_indi = False
-                for indi in indis:
-                    dist = math.sqrt((indi.x - pred.x)**2 + (indi.y - pred.y)**2)
+                for indi in indis.copy():
+                    dist = math.hypot(indi.x - pred.x, indi.y - pred.y)
                     if dist <= pred.vision:
                         if dist < 10:
                             pred.eat(indi)
                             indis.remove(indi)
+                            found_indi = True
                             break
                         pred.move_towards(indi.x, indi.y)
                         found_indi = True
                         break
+
                 if not found_indi:
                     pred.random_movement()
 
-            # indi behavior
-            for indi in indis:
-                if indi.hp <=0:
+            # Individual behavior
+            for indi in indis.copy():
+                if indi.hp <= 0:
                     indis.remove(indi)
                     continue
+
                 found_pred = False
-                for pred in preds:
-                    if math.sqrt((pred.x - indi.x)**2 + (pred.y - indi.y)**2) <= indi.vision:
+                for pred in preds.copy():
+                    if math.hypot(pred.x - indi.x, pred.y - indi.y) <= indi.vision:
                         indi.move_away(pred.x, pred.y)
                         found_pred = True
                         break
-                for food in foods:
-                    dist = math.sqrt((food.x - indi.x)**2 + (food.y - indi.y)**2)
+
+                for food in foods.copy():
+                    dist = math.hypot(food.x - indi.x, food.y - indi.y)
                     if dist <= indi.vision:
-                        if dist<10:
+                        if dist < 10:
                             indi.eat(food)
                             foods.remove(food)
+                            found_pred = True
                             break
                         indi.move_towards(food.x, food.y)
                         found_pred = True
                         break
-                  
+
                 if not found_pred:
                     indi.random_movement()
 
@@ -204,8 +209,9 @@ def main():
         else:
             w.indis = indis
             w.preds = preds
-            w.endGeneration()
             w.newGeneration()
+            indis = w.indis
+            preds = w.preds
             if len(w.indis)>1 and len(w.preds) > 1:
                 stats.append(w.getStats(gen))
             is_game_start = True

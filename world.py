@@ -37,19 +37,21 @@ class World:
         self.preds = preds
         self.food = food
 
+
     def endGeneration(self):
         # TODO : Randomly select one individual and one predator, compare they're stats and kill accordlingly
 
         indis = []
         for i in self.indis:
-            if i.hp > 0:
+            if i.hp>0 and i.generation<2:
                 indis.append(i)
         self.indis = indis
         self.indiPop = len(indis)
 
         preds = []
         for i in self.preds:
-            if i.hp > 0:
+            if i.hp > 0 and i.generation<2:
+                i.incerementGeneration()
                 preds.append(i)
         self.preds = preds
         self.predPop = len(preds)
@@ -147,7 +149,7 @@ class World:
         speed2 = parents[0 if speed1==1 else 1].speed
         mateSelectionProb2 = parents[0 if mateSelectionProb1==1 else 1].mateSelectionProb
         if indiOrPred == 'indi':
-            # self,hp,vision,speed,mateSelectionProb,color,width,height,creatureSize,maxVision
+
             child1 = Individual(hp1,vision1,speed1,mateSelectionProb1,parents[0].color,self.width,self.height,parents[0].indiSize,parents[0].maxVision)
             child1 = self.mutate(child1)
             child2 = Individual(hp2,vision2,speed2,mateSelectionProb2,parents[0].color,self.width,self.height,parents[0].indiSize,parents[0].maxVision)
@@ -164,7 +166,7 @@ class World:
     def mutate(self,creature):
         if random.random() < self.mutationChance:
             newVision = min(creature.vision + random.randint(-10,10),creature.maxVision)
-            newSpeed = creature.speed + random.randint(-5,5)
+            newSpeed = creature.speed + random.uniform(0.1,0.1)
             newHp = creature.hp + random.randint(-10,10)
             newMateSelectionProb = creature.mateSelectionProb + random.randint(-10,10)/100
 
@@ -183,6 +185,8 @@ class World:
             child1 , child2 = self.crossover(parent1,parent2,'indi')
             indis.append(child1)
             indis.append(child2)
+            indis.append(parent1)
+            indis.append(parent2)
         self.indis = indis
         self.indiPop = len(indis)
         
@@ -192,14 +196,14 @@ class World:
             child1 , child2 = self.crossover(parent1,parent2,'pred')
             preds.append(child1)
             preds.append(child2)
+            preds.append(parent1)
+            preds.append(parent2)
         self.preds = preds
         self.predPop = len(preds)
         
         self.food = [Food(10,random.randint(0,self.width),random.randint(0,self.height),self.foodSize) for i in range(self.foodCount)]
 
         # self.preds = [Predator(100,random.randint(10,self.predVisionRange),self.predSpeed,0.5,RED,self.width,self.height,self.predSize,self.predVisionRange) for i in range(self.predPop)]
-
-
 
     def getBestIndi(self):
         bestFitness = -float('inf')
